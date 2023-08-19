@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "DateManagement.h"
 
+//usuwanie w history nie dzia³a
+// ataki typu SQL Injection - oczytaæ i zastosowaæ siê do tego
+
 //PRIVATE FUCTIONS
 void DateManagement::mainMenu()
 {
@@ -161,6 +164,8 @@ void DateManagement::customerMenu()
 				std::cerr << "Error starting transaction: " << sqlite3_errmsg(date.db) << std::endl;
 				return;
 			}
+
+			// Wstawienie danych do CustomerHistoryDB
 			std::string query1 = "INSERT INTO CustomersHistoryDB SELECT * FROM Customers WHERE id = ?;";
 			sqlite3_stmt* stmt1;
 			if (sqlite3_prepare_v2(date.db, query1.c_str(), -1, &stmt1, nullptr) == SQLITE_OK)
@@ -323,7 +328,7 @@ void DateManagement::gearMenu()
 
 		case 4:
 			this->helmets->addGear(date.db, "Helmets");
-			std::system("cls");
+			//std::system("cls");
 			break;
 
 		case 5:

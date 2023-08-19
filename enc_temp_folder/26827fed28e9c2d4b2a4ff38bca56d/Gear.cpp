@@ -194,19 +194,20 @@ void Gear::returnGear(sqlite3* db, const std::string& dbName, const int gearID, 
 {
     std::string name = dbName + "_id";
 
+    // Zwiêkszenie liczby wypo¿yczonego wyposa¿enia przy zwrocie
     this->querry = "SELECT " + name + " FROM Rentals WHERE customer_id = ?;";
     this->rc = sqlite3_prepare_v2(db, this->querry.c_str(), -1, &this->stmt, nullptr);
 
     if (this->rc != SQLITE_OK)
     {
         std::cout << "Error while preparing the query: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_finalize(this->stmt); 
+        sqlite3_finalize(this->stmt); // finalize the stmt in case of error
         return;
     }
 
-    sqlite3_bind_int(this->stmt, 1, gearID);
+    sqlite3_bind_int(this->stmt, 1, gearID);  // Bindowanie wartoœci gearID do placeholdera
 
-    std::vector<int> ids;
+    std::vector<int> ids;  // Przechowuje pobrane gear_id
 
     while ((rc = sqlite3_step(this->stmt)) == SQLITE_ROW)
     {
@@ -236,11 +237,11 @@ void Gear::displayDate(sqlite3* db, const std::string& dbName)
     if (this->rc != SQLITE_OK)
     {
         std::cout << "Error while preparing the query: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_finalize(this->stmt);
+        sqlite3_finalize(this->stmt);  // Upewnij siê, ¿e zwalniasz statement nawet w przypadku b³êdu
         return;
     }
 
-    std::cout << "ID\tSTOCK COUNT\t\tSIZE" << std::endl;
+    std::cout << "ID\tSTOCK COUNT\t\tSIZE" << std::endl;  // Poprawi³em literówkê "STOCK CONT" na "STOCK COUNT"
 
     while ((this->rc = sqlite3_step(this->stmt)) == SQLITE_ROW)
     {
@@ -293,6 +294,8 @@ int Gear::getStockCount(sqlite3* db, const int gearID, const std::string& dbName
         sqlite3_finalize(this->stmt);
         return -1;
     }
+
+    // Binding the gearID to the placeholder
     sqlite3_bind_int(this->stmt, 1, gearID);
 
     this->rc = sqlite3_step(this->stmt);

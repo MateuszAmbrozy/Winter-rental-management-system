@@ -62,7 +62,7 @@ int Customers::getLastCustomerId(sqlite3* db, const std::string& dbName)
     if (sqlite3_prepare_v2(db, this->querry.c_str(), -1, &this->stmt, nullptr) != SQLITE_OK)
     {
         std::cout << "ERROR::CUSTOMERS:: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_finalize(this->stmt);
+        sqlite3_finalize(this->stmt);  // To jest wa¿ne, nawet jeœli wyst¹pi³ b³¹d!
         return lastId;
     }
 
@@ -133,6 +133,7 @@ std::string Customers::calculateEnddate(const std::string& startdate, double ren
 }
 void Customers::insertRental(sqlite3* db, const std::string rental, const int customer_id, const int ski_id, const int poles_id, const int helmet_id, const int boots_id)
 {
+    // Bezpoœrednie wstawienie nazwy tabeli w zapytaniu
     this->querry = "INSERT INTO " + rental + " (customer_id, Skis_id, Poles_id, Helmets_id, Boots_id) "
         "VALUES (?, ?, ?, ?, ?);";
 
@@ -169,7 +170,7 @@ void Customers::deleteDate(sqlite3* db, int id, const std::string& dbName)
     if (rc != SQLITE_OK)
     {
         std::cout << "ERROR::CUSTOMERS::DELETE_DATA::DELETE QUERY:: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_finalize(deleteStatement);
+        sqlite3_finalize(deleteStatement);  // Finalize the statement before returning.
         return;
     }
 
@@ -192,7 +193,7 @@ void Customers::deleteDate(sqlite3* db, int id, const std::string& dbName)
         std::cout << "ERROR::CUSTOMERS::DELETE_DATA::DELETE QUERY:: " << sqlite3_errmsg(db) << std::endl;
     }
 
-    sqlite3_finalize(deleteStatement);
+    sqlite3_finalize(deleteStatement);  // Always finalize at the end, regardless of the result.
 }
 
 std::string Customers::getCurrentdateTime()
@@ -355,6 +356,7 @@ void Customers::displayRentals(sqlite3* db, const std::string& rental)
 }
 void Customers::deleteRental(sqlite3* db, const int id, const std::string& rental)
 {
+    // Zapytanie z wi¹zaniem parametru dla id
     this->querry = "DELETE FROM " + rental + " WHERE customer_id = ?";
 
     this->rc = sqlite3_prepare_v2(db, this->querry.c_str(), -1, &stmt, nullptr);
@@ -365,6 +367,7 @@ void Customers::deleteRental(sqlite3* db, const int id, const std::string& renta
         return;
     }
 
+    // Wi¹¿emy id z zapytaniem
     sqlite3_bind_int(this->stmt, 1, id);
 
     rc = sqlite3_step(this->stmt);
@@ -378,6 +381,7 @@ void Customers::deleteRental(sqlite3* db, const int id, const std::string& renta
 }
 void Customers::equipmentReturn(sqlite3* db, int id)
 {
+    // Zapytanie z wi¹zaniem parametrów dla id oraz dla data/czas
     this->querry = "UPDATE Customers SET equipmentReturndate = ? WHERE id = ?";
     this->rc = sqlite3_prepare_v2(db, this->querry.c_str(), -1, &stmt, nullptr);
 
@@ -482,6 +486,7 @@ void Customers::deleteTable(sqlite3* db, const std::string& dbName, const std::s
     std::cout << "Type 'delete " + dbName + "' to confirm deletion of the table's content: ";
     std::getline(std::cin, confirmation);
 
+    // Remove whitespace from the entered phrase
     confirmation.erase(std::remove_if(confirmation.begin(), confirmation.end(), ::isspace), confirmation.end());
 
     if (confirmation != "delete" + dbName)
@@ -495,12 +500,14 @@ void Customers::deleteTable(sqlite3* db, const std::string& dbName, const std::s
 
     char* errMsg = nullptr;
 
+    // Delete content from Customers (or dbName) Table
     int rc1 = sqlite3_exec(db, deleteCustomerQuery.c_str(), nullptr, nullptr, &errMsg);
     if (rc1 != SQLITE_OK) {
         std::cerr << "Failed to delete content from table " << dbName << ". Error: " << errMsg << std::endl;
         sqlite3_free(errMsg);
     }
 
+    // Delete content from Rentals (or rental) Table
     int rc2 = sqlite3_exec(db, deleteRentalQuery.c_str(), nullptr, nullptr, &errMsg);
     if (rc2 != SQLITE_OK) {
         std::cerr << "Failed to delete content from table " << rental << ". Error: " << errMsg << std::endl;

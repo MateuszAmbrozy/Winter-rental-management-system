@@ -96,6 +96,7 @@ void Reservation::makeReservation(sqlite3* db, Gear* skis, Gear* poles, Gear* he
     std::string firstName, lastName, phoneNumber, startdate, enddate;
     int ski_count = 0;
     int poles_count = 0;
+    // Pobieranie danych od u¿ytkownika
     std::cout << "Enter first name: ";
     std::getline(std::cin, firstName);
 
@@ -182,7 +183,7 @@ double Reservation::gethoursDiffrence(const std::string date1, const std::string
 
     auto diff = std::abs(difftime(time1, time2)); // oblicza ró¿nicê czasu w sekundach
     std::cout << date1 << std::endl << date2 << std::endl << "Diff:: " << diff / 3600 << std::endl;
-    return diff / 3600.0;
+    return diff / 3600.0; // konwersja na godziny
 }
 
 int Reservation::getLastId(sqlite3* db)
@@ -428,6 +429,7 @@ void Reservation::displayReservation(sqlite3* db)
 
         std::string skiIDs, polesIDs, helmetsIDs, bootsIDs;
 
+        // Wykonanie zapytania SQL
         std::string selectQuery = "SELECT Skis_id, Poles_id, Helmets_id, Boots_id FROM RentalReservation WHERE customer_id = ?";
         sqlite3_stmt* statement1;
         int rc_inner = sqlite3_prepare_v2(db, selectQuery.c_str(), -1, &statement1, nullptr);
@@ -441,6 +443,7 @@ void Reservation::displayReservation(sqlite3* db)
 
         sqlite3_bind_int(statement1, 1, id);
 
+        // Pobieranie ski_id i dodawanie ich do wektora
         while (sqlite3_step(statement1) == SQLITE_ROW)
         {
             int ski_id = sqlite3_column_int(statement1, 0);
@@ -487,6 +490,7 @@ bool Reservation::isValiddate(const std::string& date)
         return false;
     }
 
+    // SprawdŸ, czy date jest poprawna
     std::time_t t = std::mktime(&tm);
     if (t == -1)
     {
