@@ -22,7 +22,6 @@ void DateManagement::mainMenu()
 		std::cout << "||   2 - Manage History of customers         ||" << std::endl;
 		std::cout << "||   3 - Manage Gear                         ||" << std::endl;
 		std::cout << "||   4 - Manage Reservations                 ||" << std::endl;
-		std::cout << "||   5 - Show All Datebases                  ||" << std::endl;
 		std::cout << "||   0 - Exit                                ||" << std::endl;
 		std::cout << "===============================================" << std::endl;
 
